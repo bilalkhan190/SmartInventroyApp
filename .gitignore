@@ -378,3 +378,6 @@ FodyWeavers.xsd
 .env
 .env.*
 !.env.example
+
+# CLI bootstrap tool (separate project — not part of SmartInventory app)
+InspectPro.CLI/
