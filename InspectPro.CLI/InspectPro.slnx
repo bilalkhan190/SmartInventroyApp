@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="InspectPro.CLI.Tests/InspectPro.CLI.Tests.csproj" />
+  <Project Path="InspectPro.CLI/InspectPro.CLI.csproj" />
+</Solution>

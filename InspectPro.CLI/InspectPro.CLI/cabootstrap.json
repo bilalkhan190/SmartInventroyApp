@@ -1,0 +1,123 @@
+{
+  "projectNames": {
+    "Api": "",
+    "Application": "",
+    "Infrastructure": "",
+    "Domain": ""
+  },
+  "packages": {
+    "Application": [
+      "MediatR",
+      "FluentValidation",
+      "AutoMapper",
+      "Microsoft.Extensions.DependencyInjection.Abstractions"
+    ],
+    "Infrastructure": [
+      "Microsoft.EntityFrameworkCore",
+      "Microsoft.EntityFrameworkCore.Design",
+      "Microsoft.EntityFrameworkCore.SqlServer",
+      "Microsoft.EntityFrameworkCore.Tools",
+      "Serilog.AspNetCore",
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.File",
+      "Hangfire",
+      "Hangfire.SqlServer"
+    ],
+    "Api": [
+      "Swashbuckle.AspNetCore",
+      "Microsoft.AspNetCore.Authentication.JwtBearer",
+      "Asp.Versioning.Http",
+      "Asp.Versioning.Mvc.ApiExplorer",
+      "HealthChecks.UI.Client"
+    ]
+  },
+  "folders": {
+    "Application": [
+      "Features",
+      "Behaviors",
+      "Common",
+      "Contracts"
+    ],
+    "Infrastructure": [
+      "Persistence",
+      "Identity",
+      "Services"
+    ],
+    "Api": [
+      "Endpoints",
+      "Middleware",
+      "Extensions"
+    ],
+    "Domain": [
+      "Entities",
+      "Enums",
+      "Events"
+    ]
+  },
+  "references": [
+    { "from": "Api", "to": "Application" },
+    { "from": "Api", "to": "Infrastructure" },
+    { "from": "Application", "to": "Domain" },
+    { "from": "Infrastructure", "to": "Application" }
+  ],
+  "templates": [
+    {
+      "name": "DependencyInjection",
+      "targetProject": "Application",
+      "relativePath": "DependencyInjection.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.DependencyInjection.cs.template"
+    },
+    {
+      "name": "DependencyInjection",
+      "targetProject": "Infrastructure",
+      "relativePath": "DependencyInjection.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.Infrastructure.DependencyInjection.cs.template",
+      "templateFile": "Templates/Infrastructure.DependencyInjection.cs.template"
+    },
+    {
+      "name": "GlobalUsings",
+      "targetProject": "Application",
+      "relativePath": "GlobalUsings.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.GlobalUsings.cs.template"
+    },
+    {
+      "name": "BaseEntity",
+      "targetProject": "Domain",
+      "relativePath": "Entities/BaseEntity.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.BaseEntity.cs.template"
+    },
+    {
+      "name": "Result",
+      "targetProject": "Application",
+      "relativePath": "Common/Result.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.Result.cs.template"
+    },
+    {
+      "name": "HandlerResult",
+      "targetProject": "Application",
+      "relativePath": "Common/HandlerResult.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.HandlerResult.cs.template"
+    },
+    {
+      "name": "PaginationRequest",
+      "targetProject": "Application",
+      "relativePath": "Common/PaginationRequest.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.PaginationRequest.cs.template"
+    },
+    {
+      "name": "PaginationResponse",
+      "targetProject": "Application",
+      "relativePath": "Common/PaginationResponse.cs",
+      "templateResource": "CaBootstrap.CLI.Templates.PaginationResponse.cs.template"
+    }
+  ],
+  "features": {
+    "installPackages": true,
+    "addReferences": true,
+    "createFolders": true,
+    "generateTemplates": true,
+    "restore": true,
+    "build": true,
+    "runTests": false
+  }
+}

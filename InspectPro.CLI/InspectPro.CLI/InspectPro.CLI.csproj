@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CaBootstrap.CLI</RootNamespace>
+    <AssemblyName>ca-bootstrap</AssemblyName>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>ca-bootstrap</ToolCommandName>
+    <PackageId>CaBootstrap.CLI</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>CaBootstrap</Authors>
+    <Description>Generic Clean Architecture bootstrap tool for .NET solutions.</Description>
+    <PackageTags>cli;clean-architecture;dotnet;bootstrap</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
+    <PackageReference Include="System.CommandLine" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Templates\**\*.template" WithCulture="false" />
+    <Content Include="Templates\**\*.template" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="cabootstrap.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="CaBootstrap.CLI.Tests" />
+  </ItemGroup>
+
+</Project>
