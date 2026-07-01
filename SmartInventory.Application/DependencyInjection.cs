@@ -1,7 +1,8 @@
-using System.Reflection;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using SmartInventory.Application.Behaviors;
+using System.Reflection;
 
 namespace SmartInventory.Application;
 
@@ -13,7 +14,7 @@ public static class DependencyInjection
 
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(assembly));
         services.AddValidatorsFromAssembly(assembly);
-        //services.AddAutoMapper(assembly);
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         return services;
     }

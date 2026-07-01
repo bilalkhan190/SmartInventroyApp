@@ -13,10 +13,20 @@ public sealed class ApplicationDbContext : DbContext, IApplicationDbContext
     }
 
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
+    public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductConfiguration());
+        modelBuilder.ApplyConfiguration(new StockMovementConfiguration());
+        modelBuilder.ApplyConfiguration(new SupplierConfiguration());
+        modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration());
+        modelBuilder.ApplyConfiguration(new PurchaseOrderItemConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

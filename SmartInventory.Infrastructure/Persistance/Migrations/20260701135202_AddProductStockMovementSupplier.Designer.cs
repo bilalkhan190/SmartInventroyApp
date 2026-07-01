@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartInventory.Infrastructure.Persistance.Context;
 
@@ -11,9 +12,11 @@ using SmartInventory.Infrastructure.Persistance.Context;
 namespace SmartInventory.Infrastructure.Persistance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260701135202_AddProductStockMovementSupplier")]
+    partial class AddProductStockMovementSupplier
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,107 +119,6 @@ namespace SmartInventory.Infrastructure.Persistance.Migrations
                         .HasFilter("[DeletedAt] IS NULL");
 
                     b.ToTable("Products", (string)null);
-                });
-
-            modelBuilder.Entity("SmartInventory.Domain.Entities.PurchaseOrder", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("OrderNo")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SupplierId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderNo")
-                        .IsUnique()
-                        .HasFilter("[DeletedAt] IS NULL");
-
-                    b.HasIndex("SupplierId");
-
-                    b.ToTable("PurchaseOrders", (string)null);
-                });
-
-            modelBuilder.Entity("SmartInventory.Domain.Entities.PurchaseOrderItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PurchaseOrderId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("UnitAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("PurchaseOrderId", "ProductId")
-                        .IsUnique()
-                        .HasFilter("[DeletedAt] IS NULL");
-
-                    b.ToTable("PurchaseOrderItems", (string)null);
                 });
 
             modelBuilder.Entity("SmartInventory.Domain.Entities.StockMovement", b =>
@@ -340,36 +242,6 @@ namespace SmartInventory.Infrastructure.Persistance.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("SmartInventory.Domain.Entities.PurchaseOrder", b =>
-                {
-                    b.HasOne("SmartInventory.Domain.Entities.Supplier", "Supplier")
-                        .WithMany("PurchaseOrders")
-                        .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Supplier");
-                });
-
-            modelBuilder.Entity("SmartInventory.Domain.Entities.PurchaseOrderItem", b =>
-                {
-                    b.HasOne("SmartInventory.Domain.Entities.Product", "Product")
-                        .WithMany("PurchaseOrderItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SmartInventory.Domain.Entities.PurchaseOrder", "PurchaseOrder")
-                        .WithMany("Items")
-                        .HasForeignKey("PurchaseOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("PurchaseOrder");
-                });
-
             modelBuilder.Entity("SmartInventory.Domain.Entities.StockMovement", b =>
                 {
                     b.HasOne("SmartInventory.Domain.Entities.Product", "Product")
@@ -383,19 +255,7 @@ namespace SmartInventory.Infrastructure.Persistance.Migrations
 
             modelBuilder.Entity("SmartInventory.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("PurchaseOrderItems");
-
                     b.Navigation("StockMovements");
-                });
-
-            modelBuilder.Entity("SmartInventory.Domain.Entities.PurchaseOrder", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("SmartInventory.Domain.Entities.Supplier", b =>
-                {
-                    b.Navigation("PurchaseOrders");
                 });
 #pragma warning restore 612, 618
         }

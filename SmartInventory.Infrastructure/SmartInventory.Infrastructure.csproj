@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Persistence\**" />
+    <EmbeddedResource Remove="Persistence\**" />
+    <None Remove="Persistence\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SmartInventory.Application\SmartInventory.Application.csproj" />
     <ProjectReference Include="..\SmartInventory.Domain\SmartInventory.Domain.csproj" />
   </ItemGroup>
@@ -32,7 +38,6 @@
   <ItemGroup>
     <Folder Include="Identity\" />
     <Folder Include="Services\" />
-    <Folder Include="Persistence\" />
   </ItemGroup>
 
 </Project>

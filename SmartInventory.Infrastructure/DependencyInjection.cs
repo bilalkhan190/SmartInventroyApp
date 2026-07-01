@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmartInventory.Application.Contracts.Persistence;
 using SmartInventory.Infrastructure.Persistance.Context;
+using SmartInventory.Infrastructure.Persistance.Seeding;
 
 namespace SmartInventory.Infrastructure;
 
@@ -17,6 +18,8 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<ApplicationDbContext>());
+
+        services.AddScoped<DatabaseSeeder>();
 
         return services;
     }

@@ -1,13 +1,12 @@
 using MediatR;
-using SmartInventory.Application.Common;
 using SmartInventory.Application.Features.Categories.Commands.CreateCategory;
 using SmartInventory.Application.Features.Categories.Queries.GetCategoriesList;
 
 namespace SmartInventory.Presentation.Endpoints;
 
-public static class CategoryEndpoints
+public sealed class CategoryEndpoint : IEndpoint
 {
-    public static IEndpointRouteBuilder MapCategoryEndpoints(this IEndpointRouteBuilder app)
+    public void MapEndpoint(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/categories")
             .WithTags("Categories");
@@ -19,8 +18,6 @@ public static class CategoryEndpoints
         group.MapPost("/", CreateCategory)
             .WithName("CreateCategory")
             .WithSummary("Create a new category");
-
-        return app;
     }
 
     private static async Task<IResult> GetCategoriesList(
@@ -28,7 +25,7 @@ public static class CategoryEndpoints
         CancellationToken cancellationToken)
     {
         var result = await sender.Send(new GetCategoriesListQuery(), cancellationToken);
-        return ToResult(result, value => Results.Ok(value));
+        return result.ToResult(value => Results.Ok(value));
     }
 
     private static async Task<IResult> CreateCategory(
@@ -40,19 +37,8 @@ public static class CategoryEndpoints
             new CreateCategoryCommand(request.CategoryName),
             cancellationToken);
 
-        return ToResult(
-            result,
+        return result.ToResult(
             value => Results.Created($"/api/categories/{value.Id}", value));
-    }
-
-    private static IResult ToResult<T>(HandlerResult<T> result, Func<T, IResult> onSuccess)
-    {
-        if (!result.IsSuccess)
-        {
-            return Results.BadRequest(new { errors = result.Errors });
-        }
-
-        return onSuccess(result.Value!);
     }
 }
 

@@ -11,4 +11,9 @@ public abstract class BaseEntity
     public DateTime? DeletedAt { get; protected set; }  
 
     public void MarkUpdated() => UpdatedAt = DateTime.UtcNow;
+
+    public void MarkDeleted()
+    {
+        DeletedAt = DateTime.UtcNow;
+    }
 }
