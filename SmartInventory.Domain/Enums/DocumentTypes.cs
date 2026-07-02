@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace SmartInventory.Domain.Enums
 {
-    public enum PurchaseOrderStatus
+    public enum DocumentTypes
     {
-        Pending = 1,
-        Rejected = 2,
-        Approved = 3,
-        SendToSupplier = 4,
-        Revised = 5,
-        Completed = 6,
+        PurchaseOrder = 1,
+        SalesOrder,
+        Invoice,
+        GoodsReceiptNote,
     }
 }

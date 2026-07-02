@@ -31,7 +31,9 @@ public sealed class GetProductsListQueryHandler
                 Description = product.Description,
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category.CategoryName,
-                Quantity = product.Quantity,
+                Quantity = product.ProductInventory != null
+                    ? product.ProductInventory.CurrentStockQuantity
+                    : product.Quantity,
                 ReorderLevel = product.ReorderLevel,
                 CreatedAt = product.CreatedAt
             })

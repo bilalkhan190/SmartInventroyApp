@@ -64,6 +64,11 @@ public sealed class CreateProductCommandHandler
         };
 
         _context.Products.Add(product);
+        _context.Inventories.Add(new Domain.Entities.Inventory
+        {
+            ProductId = product.Id,
+            CurrentStockQuantity = request.Quantity
+        });
         await _context.SaveChangesAsync(cancellationToken);
 
         return HandlerResult<ProductDto>.Success(await MapToDtoAsync(product.Id, cancellationToken));
@@ -82,7 +87,9 @@ public sealed class CreateProductCommandHandler
                 Description = product.Description,
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category.CategoryName,
-                Quantity = product.Quantity,
+                Quantity = product.ProductInventory != null
+                    ? product.ProductInventory.CurrentStockQuantity
+                    : product.Quantity,
                 ReorderLevel = product.ReorderLevel,
                 CreatedAt = product.CreatedAt
             })

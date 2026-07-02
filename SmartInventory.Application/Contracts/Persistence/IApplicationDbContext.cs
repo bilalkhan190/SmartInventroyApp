@@ -11,6 +11,10 @@ public interface IApplicationDbContext
     DbSet<Supplier> Suppliers { get; }
     DbSet<PurchaseOrder> PurchaseOrders { get; }
     DbSet<PurchaseOrderItem> PurchaseOrderItems { get; }
+    DbSet<DocumentSequences> DocumentSequences { get; }
+    DbSet<GoodReceiveNote> GoodReceiveNotes { get; }
+    DbSet<GoodReceiveNoteItem> GoodReceiveNoteItems { get; }
+    DbSet<Inventory> Inventories { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

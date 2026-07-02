@@ -30,7 +30,9 @@ public sealed class GetProductByIdQueryHandler
                 Description = p.Description,
                 CategoryId = p.CategoryId,
                 CategoryName = p.Category.CategoryName,
-                Quantity = p.Quantity,
+                Quantity = p.ProductInventory != null
+                    ? p.ProductInventory.CurrentStockQuantity
+                    : p.Quantity,
                 ReorderLevel = p.ReorderLevel,
                 CreatedAt = p.CreatedAt
             })

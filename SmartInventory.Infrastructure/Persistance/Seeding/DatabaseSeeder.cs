@@ -22,7 +22,7 @@ public sealed class DatabaseSeeder
 
     private async Task SeedCategoriesAsync(CancellationToken cancellationToken)
     {
-        if (await _context.Categories.AnyAsync(cancellationToken))
+        if (await _context.Categories.AnyAsync(x => x.DeletedAt == null ,cancellationToken))
         {
             return;
         }
@@ -103,6 +103,15 @@ public sealed class DatabaseSeeder
         };
 
         _context.Products.AddRange(products);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        var inventories = products.Select(product => new Inventory
+        {
+            ProductId = product.Id,
+            CurrentStockQuantity = product.Quantity
+        }).ToArray();
+
+        _context.Inventories.AddRange(inventories);
         await _context.SaveChangesAsync(cancellationToken);
     }
 

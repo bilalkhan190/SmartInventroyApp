@@ -16,6 +16,7 @@ namespace SmartInventory.Domain.Entities
         public int Quantity { get; set; }
         public int ReorderLevel { get; set; }
 
+        public Inventory? ProductInventory { get; set; }
         public ICollection<StockMovement> StockMovements { get; set; } = [];
         public ICollection<PurchaseOrderItem> PurchaseOrderItems { get; set; } = [];
     }

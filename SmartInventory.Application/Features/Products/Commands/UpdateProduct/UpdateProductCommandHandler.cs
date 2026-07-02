@@ -70,6 +70,25 @@ public sealed class UpdateProductCommandHandler
         product.ReorderLevel = request.ReorderLevel;
         product.MarkUpdated();
 
+        var inventory = await _context.Inventories
+            .FirstOrDefaultAsync(
+                entry => entry.ProductId == product.Id && entry.DeletedAt == null,
+                cancellationToken);
+
+        if (inventory is null)
+        {
+            _context.Inventories.Add(new Domain.Entities.Inventory
+            {
+                ProductId = product.Id,
+                CurrentStockQuantity = request.Quantity
+            });
+        }
+        else
+        {
+            inventory.CurrentStockQuantity = request.Quantity;
+            inventory.MarkUpdated();
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         var dto = await _context.Products
@@ -83,7 +102,9 @@ public sealed class UpdateProductCommandHandler
                 Description = p.Description,
                 CategoryId = p.CategoryId,
                 CategoryName = p.Category.CategoryName,
-                Quantity = p.Quantity,
+                Quantity = p.ProductInventory != null
+                    ? p.ProductInventory.CurrentStockQuantity
+                    : p.Quantity,
                 ReorderLevel = p.ReorderLevel,
                 CreatedAt = p.CreatedAt
             })

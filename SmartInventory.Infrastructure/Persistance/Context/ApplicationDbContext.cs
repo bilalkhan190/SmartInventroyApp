@@ -18,6 +18,10 @@ public sealed class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
     public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
+    public DbSet<DocumentSequences> DocumentSequences => Set<DocumentSequences>();
+    public DbSet<GoodReceiveNote> GoodReceiveNotes => Set<GoodReceiveNote>();
+    public DbSet<GoodReceiveNoteItem> GoodReceiveNoteItems => Set<GoodReceiveNoteItem>();
+    public DbSet<Inventory> Inventories => Set<Inventory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -27,6 +31,10 @@ public sealed class ApplicationDbContext : DbContext, IApplicationDbContext
         modelBuilder.ApplyConfiguration(new SupplierConfiguration());
         modelBuilder.ApplyConfiguration(new PurchaseOrderConfiguration());
         modelBuilder.ApplyConfiguration(new PurchaseOrderItemConfiguration());
+        modelBuilder.ApplyConfiguration(new DocumentSequenceConfiguration());
+        modelBuilder.ApplyConfiguration(new GoodReceiveNoteConfiguration());
+        modelBuilder.ApplyConfiguration(new GoodReceiveNoteItemConfiguration());
+        modelBuilder.ApplyConfiguration(new InventoryConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

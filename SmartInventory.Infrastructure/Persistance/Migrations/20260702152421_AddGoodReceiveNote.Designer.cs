@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartInventory.Infrastructure.Persistance.Context;
 
@@ -11,9 +12,11 @@ using SmartInventory.Infrastructure.Persistance.Context;
 namespace SmartInventory.Infrastructure.Persistance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260702152421_AddGoodReceiveNote")]
+    partial class AddGoodReceiveNote
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -205,45 +208,6 @@ namespace SmartInventory.Infrastructure.Persistance.Migrations
                         .HasFilter("[DeletedAt] IS NULL");
 
                     b.ToTable("GoodReceiveNoteItems", (string)null);
-                });
-
-            modelBuilder.Entity("SmartInventory.Domain.Entities.Inventory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CurrentStockQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId")
-                        .IsUnique()
-                        .HasFilter("[DeletedAt] IS NULL");
-
-                    b.ToTable("Inventories", (string)null);
                 });
 
             modelBuilder.Entity("SmartInventory.Domain.Entities.Product", b =>
@@ -553,17 +517,6 @@ namespace SmartInventory.Infrastructure.Persistance.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("SmartInventory.Domain.Entities.Inventory", b =>
-                {
-                    b.HasOne("SmartInventory.Domain.Entities.Product", "Product")
-                        .WithOne("ProductInventory")
-                        .HasForeignKey("SmartInventory.Domain.Entities.Inventory", "ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("SmartInventory.Domain.Entities.Product", b =>
                 {
                     b.HasOne("SmartInventory.Domain.Entities.Category", "Category")
@@ -623,8 +576,6 @@ namespace SmartInventory.Infrastructure.Persistance.Migrations
 
             modelBuilder.Entity("SmartInventory.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("ProductInventory");
-
                     b.Navigation("PurchaseOrderItems");
 
                     b.Navigation("StockMovements");
