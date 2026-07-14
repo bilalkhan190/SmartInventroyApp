@@ -49,6 +49,12 @@ public sealed class CreateGoodReceiveNoteHandler
             return HandlerResult<GoodReceiveNoteDto>.Failure("Purchase order not found.");
         }
 
+        if (purchaseOrder.Status != PurchaseOrderStatus.Approved)
+        {
+            return HandlerResult<GoodReceiveNoteDto>.Failure(
+                "Goods can only be received against approved purchase orders.");
+        }
+
         var poItemsByProductId = purchaseOrder.Items
             .ToDictionary(item => item.ProductId);
 

@@ -1,6 +1,11 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 using SmartInventory.Application;
 using SmartInventory.Infrastructure;
 using SmartInventory.Infrastructure.Persistance.Seeding;
+using SmartInventory.Presentation.Authentication;
 using SmartInventory.Presentation.Extensions;
 using SmartInventory.Presentation.Middleware;
 
@@ -9,6 +14,54 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpoints();
+
+var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
+var jwtOptions = jwtSection.Get<JwtOptions>()
+    ?? throw new InvalidOperationException("JWT configuration is missing.");
+
+if (string.IsNullOrWhiteSpace(jwtOptions.Issuer)
+    || string.IsNullOrWhiteSpace(jwtOptions.Audience))
+{
+    throw new InvalidOperationException("JWT issuer and audience must be configured.");
+}
+
+if (Encoding.UTF8.GetByteCount(jwtOptions.Key) < 32)
+{
+    throw new InvalidOperationException("JWT key must be at least 32 bytes. Configure Jwt:Key or Jwt__Key.");
+}
+
+if (jwtOptions.AccessTokenMinutes <= 0 || jwtOptions.RefreshTokenDays <= 0)
+{
+    throw new InvalidOperationException("JWT token lifetimes must be greater than zero.");
+}
+
+builder.Services.Configure<JwtOptions>(jwtSection);
+builder.Services.AddSingleton<JwtTokenService>();
+builder.Services.AddSingleton<PasswordService>();
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 builder.Services.AddCors(options =>
 {
@@ -66,6 +119,9 @@ else
 }
 
 app.UseMiddleware<ValidationExceptionMiddleware>();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapEndpoints();
 

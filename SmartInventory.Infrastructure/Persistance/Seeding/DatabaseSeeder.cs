@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SmartInventory.Domain.Entities;
+using SmartInventory.Infrastructure.Identity;
 using SmartInventory.Infrastructure.Persistance.Context;
 
 namespace SmartInventory.Infrastructure.Persistance.Seeding;
@@ -7,10 +9,12 @@ namespace SmartInventory.Infrastructure.Persistance.Seeding;
 public sealed class DatabaseSeeder
 {
     private readonly ApplicationDbContext _context;
+    private readonly IConfiguration _configuration;
 
-    public DatabaseSeeder(ApplicationDbContext context)
+    public DatabaseSeeder(ApplicationDbContext context, IConfiguration configuration)
     {
         _context = context;
+        _configuration = configuration;
     }
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
@@ -18,6 +22,36 @@ public sealed class DatabaseSeeder
         await SeedCategoriesAsync(cancellationToken);
         await SeedProductsAsync(cancellationToken);
         await SeedSuppliersAsync(cancellationToken);
+        await SeedAdminAsync(cancellationToken);
+    }
+
+    private async Task SeedAdminAsync(CancellationToken cancellationToken)
+    {
+        var username = _configuration["SeedAdmin:Username"];
+        var password = _configuration["SeedAdmin:Password"];
+
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        {
+            return;
+        }
+
+        var normalizedUsername = username.Trim().ToUpperInvariant();
+        if (await _context.Users.AnyAsync(
+            user => user.NormalizedEmail == normalizedUsername && user.DeletedAt == null,
+            cancellationToken))
+        {
+            return;
+        }
+
+        _context.Users.Add(new User
+        {
+            Email = username.Trim(),
+            NormalizedEmail = normalizedUsername,
+            DisplayName = "Administrator",
+            PasswordHash = PasswordHashing.Hash(password)
+        });
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     private async Task SeedCategoriesAsync(CancellationToken cancellationToken)

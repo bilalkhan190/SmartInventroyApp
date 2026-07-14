@@ -15,7 +15,7 @@ namespace SmartInventory.Domain.Entities
 
         public Guid ReferenceId {  get; set; }
         public StockReferenceType StockReferenceType { get; set; }
-        public string ReferenceNo{ get; set; }  
+        public string ReferenceNo { get; set; } = string.Empty;
         public int Quantity { get; set; }
         public string? Reason { get; set; }
     }

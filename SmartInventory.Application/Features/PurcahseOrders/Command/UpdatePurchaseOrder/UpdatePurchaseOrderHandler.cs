@@ -1,34 +1,30 @@
-﻿using FluentValidation;
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using SmartInventory.Application.Common;
-using SmartInventory.Application.Contracts;
 using SmartInventory.Application.Contracts.Persistence;
 using SmartInventory.Application.Features.PurcahseOrders;
 using SmartInventory.Domain.Entities;
 using SmartInventory.Domain.Enums;
 
-namespace SmartInventory.Application.Features.PurcahseOrders.Command.CreatePurcahseOrder;
+namespace SmartInventory.Application.Features.PurcahseOrders.Command.UpdatePurchaseOrder;
 
-public sealed class CreatePurchaseOrderCommandHandler
-    : IRequestHandler<CreatePurchaseOrderCommand, HandlerResult<PurchaseOrderDto>>
+public sealed class UpdatePurchaseOrderHandler
+    : IRequestHandler<UpdatePurchaseOrderCommand, HandlerResult<PurchaseOrderDto>>
 {
     private readonly IApplicationDbContext _context;
-    private readonly IDocumentNumberGenerator _documentNumberGenerator;
-    private readonly IValidator<CreatePurchaseOrderCommand> _validator;
+    private readonly IValidator<UpdatePurchaseOrderCommand> _validator;
 
-    public CreatePurchaseOrderCommandHandler(
+    public UpdatePurchaseOrderHandler(
         IApplicationDbContext context,
-        IDocumentNumberGenerator documentNumberGenerator,
-        IValidator<CreatePurchaseOrderCommand> validator)
+        IValidator<UpdatePurchaseOrderCommand> validator)
     {
         _context = context;
-        _documentNumberGenerator = documentNumberGenerator;
         _validator = validator;
     }
 
     public async Task<HandlerResult<PurchaseOrderDto>> Handle(
-        CreatePurchaseOrderCommand request,
+        UpdatePurchaseOrderCommand request,
         CancellationToken cancellationToken)
     {
         var validation = await _validator.ValidateAsync(request, cancellationToken);
@@ -36,6 +32,24 @@ public sealed class CreatePurchaseOrderCommandHandler
         {
             return HandlerResult<PurchaseOrderDto>.Failure(
                 validation.Errors.Select(error => error.ErrorMessage).ToArray());
+        }
+
+        var purchaseOrder = await _context.PurchaseOrders
+            .Include(order => order.Items.Where(item => item.DeletedAt == null))
+            .FirstOrDefaultAsync(
+                order => order.Id == request.Id && order.DeletedAt == null,
+                cancellationToken);
+
+        if (purchaseOrder is null)
+        {
+            return HandlerResult<PurchaseOrderDto>.Failure("Purchase order not found.");
+        }
+
+        if (purchaseOrder.Status != PurchaseOrderStatus.Pending &&
+            purchaseOrder.Status != PurchaseOrderStatus.Revised)
+        {
+            return HandlerResult<PurchaseOrderDto>.Failure(
+                "Only pending or revised purchase orders can be edited.");
         }
 
         var supplierExists = await _context.Suppliers
@@ -62,16 +76,14 @@ public sealed class CreatePurchaseOrderCommandHandler
 
         var productsById = existingProducts.ToDictionary(product => product.Id);
 
-        var orderNo = await _documentNumberGenerator.NextPurchaseOrderNoAsync(cancellationToken);
+        purchaseOrder.SupplierId = request.SupplierId;
+        purchaseOrder.Notes = NormalizeOptional(request.Notes);
+        purchaseOrder.MarkUpdated();
 
-        var purchaseOrder = new PurchaseOrder
+        foreach (var existingItem in purchaseOrder.Items)
         {
-            OrderNo = orderNo,
-            SupplierId = request.SupplierId,
-            Status = PurchaseOrderStatus.Revised,
-            OrderDate = DateTime.UtcNow,
-            Notes = NormalizeOptional(request.Notes)
-        };
+            existingItem.MarkDeleted();
+        }
 
         foreach (var item in request.Products)
         {
@@ -83,33 +95,33 @@ public sealed class CreatePurchaseOrderCommandHandler
             });
         }
 
-        _context.PurchaseOrders.Add(purchaseOrder);
         await _context.SaveChangesAsync(cancellationToken);
-
-        var supplierName = await _context.Suppliers
-            .AsNoTracking()
-            .Where(supplier => supplier.Id == request.SupplierId)
-            .Select(supplier => supplier.Name)
-            .FirstAsync(cancellationToken);
 
         return HandlerResult<PurchaseOrderDto>.Success(new PurchaseOrderDto
         {
             Id = purchaseOrder.Id,
             OrderNo = purchaseOrder.OrderNo,
             SupplierId = purchaseOrder.SupplierId,
-            SupplierName = supplierName,
+            SupplierName = await _context.Suppliers
+                .AsNoTracking()
+                .Where(supplier => supplier.Id == purchaseOrder.SupplierId)
+                .Select(supplier => supplier.Name)
+                .FirstAsync(cancellationToken),
             Status = purchaseOrder.Status.ToString(),
             OrderDate = purchaseOrder.OrderDate,
             Notes = purchaseOrder.Notes,
-            Items = purchaseOrder.Items.Select(item => new PurchaseOrderItemDto
-            {
-                Id = item.Id,
-                ProductId = item.ProductId,
-                ProductName = productsById[item.ProductId].Name,
-                Sku = productsById[item.ProductId].Sku,
-                Quantity = item.Quantity,
-                UnitAmount = item.UnitAmount
-            }).ToList()
+            Items = purchaseOrder.Items
+                .Where(item => item.DeletedAt == null)
+                .Select(item => new PurchaseOrderItemDto
+                {
+                    Id = item.Id,
+                    ProductId = item.ProductId,
+                    ProductName = productsById[item.ProductId].Name,
+                    Sku = productsById[item.ProductId].Sku,
+                    Quantity = item.Quantity,
+                    UnitAmount = item.UnitAmount
+                })
+                .ToList()
         });
     }
 

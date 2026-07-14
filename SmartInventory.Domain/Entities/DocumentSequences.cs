@@ -8,5 +8,5 @@ public class DocumentSequences
     public DocumentTypes DocumentType { get; set; }
     public int Year { get; set; }
     public int LastNumber { get; set; }
-    public string Prefix { get; set; } 
+    public string Prefix { get; set; } = string.Empty;
 }

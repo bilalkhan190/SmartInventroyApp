@@ -15,6 +15,8 @@ public interface IApplicationDbContext
     DbSet<GoodReceiveNote> GoodReceiveNotes { get; }
     DbSet<GoodReceiveNoteItem> GoodReceiveNoteItems { get; }
     DbSet<Inventory> Inventories { get; }
+    DbSet<User> Users { get; }
+    DbSet<RefreshToken> RefreshTokens { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
